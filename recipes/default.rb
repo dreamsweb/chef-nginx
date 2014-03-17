@@ -27,10 +27,10 @@ template "/etc/nginx/nginx.conf" do
 end
 
 # rails app upstream
-if @node[:nginx][:upstream]
-  template "/etc/nginx/sites-enabled/#{@node[:nginx][:upstream][:server_name]}" do
-    owner "#{@node[:nginx][:upstream][:run_user]}"
-    group "#{@node[:nginx][:upstream][:run_user]}"
+if node[:nginx][:upstream]
+  template "/etc/nginx/sites-enabled/#{node[:nginx][:upstream][:server_name]}" do
+    owner "#{node[:nginx][:upstream][:run_user]}"
+    group "#{node[:nginx][:upstream][:run_user]}"
     mode "0644"
     source "upstream.erb"
     notifies :run, "execute[restart-nginx]", :immediately
