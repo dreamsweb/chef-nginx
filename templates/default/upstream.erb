@@ -1,5 +1,5 @@
 upstream <%=@node[:nginx][:upstream][:name]%> {
-  server unix:/home/apps/<%=@node[:nginx][:upstream][:server_name]%>/shared/tmp/sockets/unicorn.sock fail_timeout=0;
+  server unix:/home/apps/<%=@node[:nginx][:upstream][:app_name]%>/shared/tmp/sockets/unicorn.sock fail_timeout=0;
 }
 server {
   listen 80;
@@ -17,7 +17,7 @@ server {
   access_log  /var/log/nginx/<%=@node[:nginx][:upstream][:server_name]%>.access.log;
   error_log  /var/log/nginx/<%=@node[:nginx][:upstream][:server_name]%>.error.log;
 
-  root /home/apps/<%=@node[:nginx][:upstream][:server_name]%>/current/public;
+  root /home/apps/<%=@node[:nginx][:upstream][:app_name]%>/current/public;
 
   try_files $uri/index.html $uri.html $uri @<%=@node[:nginx][:upstream][:name]%>;
 
@@ -35,6 +35,6 @@ server {
 
   error_page 500 502 503 504 /500.html;
   location = /500.html {
-    root /home/apps/<%=@node[:nginx][:upstream][:server_name]%>/current/public;
+    root /home/apps/<%=@node[:nginx][:upstream][:app_name]%>/current/public;
   }
 }
