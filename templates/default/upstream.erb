@@ -1,5 +1,5 @@
 upstream <%=@node[:nginx][:upstream][:name]%> {
-  server unix:/home/apps/<%=@node[:nginx][:upstream][:app_name]%>/shared/tmp/sockets/unicorn.sock fail_timeout=0;
+  server unix:/home/apps/<%=@node[:nginx][:upstream][:app_name]%>/<%=@node[:nginx][:upstream][:shared_unicorn_name]%>/unicorn.sock fail_timeout=0;
 }
 server {
   listen 80;
