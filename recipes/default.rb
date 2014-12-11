@@ -40,9 +40,10 @@ if node[:nginx][:upstream]
     notifies :run, "execute[restart-nginx]", :immediately
   end
 
-  bash "symlink available site" do
+  bash "symlink available site if not exist" do
     user "root"
     code "ln -s /etc/nginx/sites-available/#{node[:nginx][:upstream][:server_name]} /etc/nginx/sites-enabled/#{node[:nginx][:upstream][:server_name]}"
+    not_if { File.exist?("/etc/nginx/sites-enabled/#{node[:nginx][:upstream][:server_name]}") }
   end
 end
 
