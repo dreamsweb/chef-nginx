@@ -1,0 +1,35 @@
+server {
+  listen 80;
+  server_name www.<%= @server_name %>;
+  rewrite ^(.*)$ http://<%= @server_name %>$1 permanent;
+}
+
+server {
+  listen 80;
+
+  root /home/apps/<%= @app_name %>;
+  index index.html index.htm;
+
+  #server_names_hash_bucket_size 64;
+  server_name <%= @server_name %>;
+
+  charset utf-8;
+  error_page 500 502 503 504 /500.php;
+  error_page 404 /404.php;
+
+  location / {
+    root /home/apps/<%= @app_name %>;
+  }
+
+  location ~* \.(jpg|jpeg|gif|png|css|js|ico|xml)$ {
+    access_log        off;
+    log_not_found     off;
+    expires           1d;
+  }
+
+  location ~ /\. {
+    access_log off;
+    log_not_found off;
+    deny all;
+  }
+}
