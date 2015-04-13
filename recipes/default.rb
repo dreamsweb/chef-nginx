@@ -30,20 +30,28 @@ if node[:nginx][:reconfigure]
   end
 end
 
-# rails app upstream
-if node[:nginx][:upstream]
-  template "/etc/nginx/sites-available/#{node[:nginx][:upstream][:server_name]}" do
-    owner "#{node[:nginx][:upstream][:run_user]}"
-    group "#{node[:nginx][:upstream][:run_user]}"
+# add site configs
+all_sites do |template, server_name, app_name, run_user, upstream_name, shared_unicorn_name|
+  template "/etc/nginx/sites-available/#{server_name}" do
+    owner "#{run_user}"
+    group "#{run_user}"
     mode "0644"
-    source "upstream.erb"
+    source "#{template}.erb"
+
+    variables({
+      upstream_name: upstream_name,
+      server_name: server_name,
+      app_name: app_name,
+      shared_unicorn_name: shared_unicorn_name
+    })
+
     notifies :run, "execute[restart-nginx]", :immediately
   end
 
   bash "symlink available site if not exist" do
     user "root"
-    code "ln -s /etc/nginx/sites-available/#{node[:nginx][:upstream][:server_name]} /etc/nginx/sites-enabled/#{node[:nginx][:upstream][:server_name]}"
-    not_if { File.exist?("/etc/nginx/sites-enabled/#{node[:nginx][:upstream][:server_name]}") }
+    code "ln -s /etc/nginx/sites-available/#{server_name} /etc/nginx/sites-enabled/#{server_name}"
+    not_if { File.exist?("/etc/nginx/sites-enabled/#{server_name}") }
   end
 end
 
