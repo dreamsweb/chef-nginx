@@ -30,19 +30,19 @@ if node[:nginx][:reconfigure]
   end
 end
 
-# add site configs
-all_sites do |template, server_name, app_name, run_user, upstream_name, shared_unicorn_name|
-  template "/etc/nginx/sites-available/#{server_name}" do
-    owner "#{run_user}"
-    group "#{run_user}"
+# write site configs from templates
+all_sites do |site|
+  template "/etc/nginx/sites-available/#{ site[:server_name] }" do
+    owner "#{ site[:run_user] }"
+    group "#{ site[:run_user] }"
     mode "0644"
-    source "#{template}.erb"
+    source "#{ site[:template] }.erb"
 
     variables({
-      upstream_name: upstream_name,
-      server_name: server_name,
-      app_name: app_name,
-      shared_unicorn_name: shared_unicorn_name
+      upstream_name: site[:upstream_name],
+      server_name: site[:server_name],
+      app_name: site[:app_name],
+      shared_unicorn_name: site[:shared_unicorn_name]
     })
 
     notifies :run, "execute[restart-nginx]", :immediately
@@ -50,8 +50,8 @@ all_sites do |template, server_name, app_name, run_user, upstream_name, shared_u
 
   bash "symlink available site if not exist" do
     user "root"
-    code "ln -s /etc/nginx/sites-available/#{server_name} /etc/nginx/sites-enabled/#{server_name}"
-    not_if { File.exist?("/etc/nginx/sites-enabled/#{server_name}") }
+    code "ln -s /etc/nginx/sites-available/#{ site[:server_name] } /etc/nginx/sites-enabled/#{ site[:server_name] }"
+    not_if { File.exist?("/etc/nginx/sites-enabled/#{ site[:server_name] }") }
   end
 end
 
